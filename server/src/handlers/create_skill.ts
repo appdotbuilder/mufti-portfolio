@@ -1,13 +1,22 @@
+import { db } from '../db';
+import { skillsTable } from '../db/schema';
 import { type CreateSkillInput, type Skill } from '../schema';
 
-export async function createSkill(input: CreateSkillInput): Promise<Skill> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new skill and persisting it in the database.
-    
-    return {
-        id: Math.floor(Math.random() * 1000), // Placeholder ID
+export const createSkill = async (input: CreateSkillInput): Promise<Skill> => {
+  try {
+    // Insert skill record
+    const result = await db.insert(skillsTable)
+      .values({
         name: input.name,
-        category: input.category || null,
-        created_at: new Date()
-    };
-}
+        category: input.category
+      })
+      .returning()
+      .execute();
+
+    const skill = result[0];
+    return skill;
+  } catch (error) {
+    console.error('Skill creation failed:', error);
+    throw error;
+  }
+};

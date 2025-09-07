@@ -1,19 +1,23 @@
+import { db } from '../db';
+import { skillsTable } from '../db/schema';
 import { type Skill } from '../schema';
 
-export async function getSkills(): Promise<Skill[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all skills from the database.
-    
-    // Default skills as mentioned in the requirements
-    const defaultSkills = [
-        "JavaScript", "React", "Git", "GitHub", "Bootstrap", 
-        "HTML5", "CSS3", "Laravel", "MySQL", "Tailwind", "Node.js"
-    ];
-    
-    return defaultSkills.map((skill, index) => ({
-        id: index + 1,
-        name: skill,
-        category: null,
-        created_at: new Date()
+export const getSkills = async (): Promise<Skill[]> => {
+  try {
+    // Fetch all skills from the database
+    const result = await db.select()
+      .from(skillsTable)
+      .execute();
+
+    // Return skills with proper field mapping
+    return result.map(skill => ({
+      id: skill.id,
+      name: skill.name,
+      category: skill.category,
+      created_at: skill.created_at
     }));
-}
+  } catch (error) {
+    console.error('Failed to fetch skills:', error);
+    throw error;
+  }
+};
